@@ -42,13 +42,12 @@ void Dialog::update_progress_bar()
 {
   //qDebug() << "Progress at: " << stk_->getProgress();
   double progress = stk_->getProgress();
-  qDebug() << progress;
+  //qDebug() << progress;
   if(progress >= 1.0) {
     ui->pushButton->setEnabled(true);
     ui->progressBar->reset();
     ui->progressBar->setEnabled(false);
     timer_->stop();
-    qDebug() << "Update finished.";
   } else {
     ui->progressBar->setValue(progress*100);
   }
