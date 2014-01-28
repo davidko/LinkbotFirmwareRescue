@@ -3,6 +3,7 @@
 #include <libstkcomms.hpp>
 #include <mobot.h>
 #include <QDebug>
+#include <QMessageBox>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -23,12 +24,29 @@ void Dialog::on_pushButton_clicked()
   char buf[1024];
   int rc;
   rc = Mobot_dongleGetTTY(buf, 1024);
+  QMessageBox msgbox;
   if(rc) {
+    msgbox.setText("No connected robots detected.");
+    msgbox.exec();
     return;
   }
   stk_ = new CStkComms();
   rc = stk_->connectWithTTY(buf);
-  if(rc) { return; }
+  if(rc) { 
+    msgbox.setText("Detected robot not running valid bootloader. Please make "
+        "sure that the \"Program Firmware\" button is being clicked after "
+        "the red LED flashes but before the solid blue LED is showing.");
+    msgbox.exec();
+    return; 
+  }
+  rc = stk_->handshake();
+  if(rc) { 
+    msgbox.setText("Detected robot not running valid bootloader. Please make "
+        "sure that the \"Program Firmware\" button is being clicked after "
+        "the red LED flashes but before the solid blue LED is showing.");
+    msgbox.exec();
+    return; 
+  }
   stk_->programAllAsync("hexfile.hex");
   ui->progressBar->setEnabled(true);
   /* Start a timer to update the progress bar */
