@@ -12,6 +12,10 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(100);
+    dongleListener_ = new Listener(this);
+    QObject::connect(dongleListener_, SIGNAL(dongleDetected(const QString&)),
+        this, SLOT(beginProgramming()));
+    dongleListener_->startWork();
 }
 
 Dialog::~Dialog()
@@ -19,7 +23,7 @@ Dialog::~Dialog()
     delete ui;
 }
 
-void Dialog::on_pushButton_clicked()
+void Dialog::beginProgramming()
 {
   char buf[1024];
   int rc;
@@ -53,7 +57,6 @@ void Dialog::on_pushButton_clicked()
   timer_ = new QTimer(this);
   QObject::connect(timer_, SIGNAL(timeout()), this, SLOT(update_progress_bar()));
   timer_->start(1000);
-  ui->pushButton->setEnabled(false);
 }
 
 void Dialog::update_progress_bar()
@@ -62,10 +65,10 @@ void Dialog::update_progress_bar()
   double progress = stk_->getProgress();
   //qDebug() << progress;
   if(progress >= 1.0) {
-    ui->pushButton->setEnabled(true);
     ui->progressBar->reset();
     ui->progressBar->setEnabled(false);
     timer_->stop();
+    dongleListener_->startWork();
   } else {
     ui->progressBar->setValue(progress*100);
   }

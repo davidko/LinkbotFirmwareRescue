@@ -5,6 +5,8 @@
 #include <QTimer>
 #include <libstkcomms.hpp>
 
+#include "listener.h"
+
 namespace Ui {
 class Dialog;
 }
@@ -17,12 +19,13 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
 
-private slots:
-    void on_pushButton_clicked();
+public slots:
+    void beginProgramming();
     void update_progress_bar();
 
 private:
     Ui::Dialog *ui;
+    Listener *dongleListener_;
     QTimer *timer_;
     CStkComms* stk_;
 };

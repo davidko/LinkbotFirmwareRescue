@@ -26,15 +26,8 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Begin with the robot powered off, disconnected from the computer, and this application running.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Connect the robot to the computer using a usb cable. &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Hold the power button down on the robot until the red LED flashes. &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. As soon as the red LED stops flashing, press the &amp;quot;Program Firmware&amp;quot; button below this text box. &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. This program should detect the robot and begin programming the firmware automatically.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;5. Wait until the the robot boots, beeps, and shows a blue LED light before disconnecting or powering off the robot. The programming process should take 1-2 minutes. The robot is now ready to use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>Program Firmware</string>
      </property>
     </widget>
    </item>

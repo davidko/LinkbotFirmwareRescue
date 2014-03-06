@@ -14,9 +14,10 @@ TEMPLATE = app
 INCLUDEPATH = ../libstkcomms ../libbarobo/include
 
 SOURCES += main.cpp\
-        dialog.cpp
+        dialog.cpp\
+        listener.cpp
 
-HEADERS  += dialog.h
+HEADERS  += dialog.h listener.h
 
 FORMS    += dialog.ui
 
