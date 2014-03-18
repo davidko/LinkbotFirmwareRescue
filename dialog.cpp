@@ -25,32 +25,68 @@ Dialog::~Dialog()
 
 void Dialog::beginProgramming()
 {
+  int numTries = 0;
   char buf[1024];
   int rc;
-  rc = Mobot_dongleGetTTY(buf, 1024);
   QMessageBox msgbox;
+#ifdef _WIN32
+    Sleep(3000);
+#else
+    usleep(3000000);
+#endif
+  rc = Mobot_dongleGetTTY(buf, 1024);
   if(rc) {
     msgbox.setText("No connected robots detected.");
     msgbox.exec();
     return;
   }
-  stk_ = new CStkComms();
-  rc = stk_->connectWithTTY(buf);
-  if(rc) { 
-    msgbox.setText("Detected robot not running valid bootloader. Please make "
-        "sure that the \"Program Firmware\" button is being clicked after "
-        "the red LED flashes but before the solid blue LED is showing.");
-    msgbox.exec();
-    return; 
+  while(1) {
+    qDebug() << "Connecting to: " << buf;
+    stk_ = new CStkComms();
+    rc = stk_->connectWithTTY(buf);
+    qDebug() << "Connection finish with code: " << rc;
+    if(rc) { 
+      if(numTries > 20) {
+        msgbox.setText("Detected robot not running valid bootloader. Please make "
+            "sure that the \"Program Firmware\" button is being clicked after "
+            "the red LED flashes but before the solid blue LED is showing. 1");
+        msgbox.exec();
+        return; 
+      } else {
+#ifdef _WIN32
+        Sleep(100);
+#else
+        usleep(100000);
+#endif
+        numTries++;
+      }
+    } else {
+      break;
+    }
+    numTries = 0;
+#if 0
+    qDebug() << "Attempting handshake...";
+    rc = stk_->handshake();
+    qDebug() << "Handshake finished with code " << rc;
+    if(rc) { 
+      if(numTries > 5) {
+        msgbox.setText("Detected robot not running valid bootloader. Please make "
+            "sure that the \"Program Firmware\" button is being clicked after "
+            "the red LED flashes but before the solid blue LED is showing. 2");
+        msgbox.exec();
+        return; 
+      } else {
+#ifdef _WIN32
+        Sleep(500);
+#else
+        usleep(500000);
+#endif
+        numTries++;
+      }
+    }
+#endif
   }
-  rc = stk_->handshake();
-  if(rc) { 
-    msgbox.setText("Detected robot not running valid bootloader. Please make "
-        "sure that the \"Program Firmware\" button is being clicked after "
-        "the red LED flashes but before the solid blue LED is showing.");
-    msgbox.exec();
-    return; 
-  }
+  qDebug() << "Attempting to begin programming...";
   stk_->programAllAsync("hexfile.hex");
   ui->progressBar->setEnabled(true);
   /* Start a timer to update the progress bar */
