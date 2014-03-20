@@ -87,7 +87,7 @@ void Dialog::beginProgramming()
 #endif
   }
   qDebug() << "Attempting to begin programming...";
-  stk_->programAllAsync("hexfile.hex");
+  stk_->programAllAsync("v3.0.1-98.hex");
   ui->progressBar->setEnabled(true);
   /* Start a timer to update the progress bar */
   timer_ = new QTimer(this);
