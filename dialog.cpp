@@ -104,6 +104,7 @@ void Dialog::update_progress_bar()
     ui->progressBar->reset();
     ui->progressBar->setEnabled(false);
     timer_->stop();
+    stk_->disconnect();
     dongleListener_->startWork();
   } else {
     ui->progressBar->setValue(progress*100);
