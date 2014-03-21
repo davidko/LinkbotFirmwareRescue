@@ -4,6 +4,7 @@
 #include <mobot.h>
 #include <QDebug>
 #include <QMessageBox>
+#include <cassert>
 
 std::string g_hexfilename;
 
@@ -26,7 +27,7 @@ Dialog::Dialog(QWidget *parent) :
   HKEY key;
   int rc;
 
-  rc = RegOpenKeyEx(
+  rc = RegOpenKeyExA(
       HKEY_LOCAL_MACHINE,
       "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\BaroboLink.exe",
       0,
@@ -34,18 +35,11 @@ Dialog::Dialog(QWidget *parent) :
       &key);
 
   if (ERROR_SUCCESS != rc) {
-    GtkWidget* d = gtk_message_dialog_new(
-        GTK_WINDOW(gtk_builder_get_object(g_builder, "window1")),
-        GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_ERROR,
-        GTK_BUTTONS_OK,
-	"Unable to find BaroboLink location in registry.\nTry re-installing BaroboLink.");
-    gtk_dialog_run(GTK_DIALOG(d));
     return;
   }
 
   /* Find out how much memory to allocate. */
-  rc = RegQueryValueEx(
+  rc = RegQueryValueExA(
       key,
       "PATH",
       NULL,
@@ -58,7 +52,7 @@ Dialog::Dialog(QWidget *parent) :
    * unicode or whatever */
   char* path = new char [size + 1];
 
-  rc = RegQueryValueEx(
+  rc = RegQueryValueExA(
       key,
       "PATH",
       NULL,

@@ -6,6 +6,8 @@
 
 QT       += core gui
 
+#CONFIG += console
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = LinkbotFirmwareRescue
@@ -21,4 +23,4 @@ HEADERS  += dialog.h listener.h
 
 FORMS    += dialog.ui
 
-LIBS += -L../libstkcomms/build -lstkcomms -L../stage/lib -lbarobo -lbluetooth
+LIBS += -L../libstkcomms/build -lstkcomms -L../stage/lib -lbarobo -lws2_32
