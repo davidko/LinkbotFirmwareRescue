@@ -5,17 +5,74 @@
 #include <QDebug>
 #include <QMessageBox>
 
+std::string g_hexfilename;
+
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
-    ui->setupUi(this);
-    ui->progressBar->setMinimum(0);
-    ui->progressBar->setMaximum(100);
-    dongleListener_ = new Listener(this);
-    QObject::connect(dongleListener_, SIGNAL(dongleDetected(const QString&)),
-        this, SLOT(beginProgramming()));
-    dongleListener_->startWork();
+  ui->setupUi(this);
+  ui->progressBar->setMinimum(0);
+  ui->progressBar->setMaximum(100);
+  dongleListener_ = new Listener(this);
+  QObject::connect(dongleListener_, SIGNAL(dongleDetected(const QString&)),
+      this, SLOT(beginProgramming()));
+  dongleListener_->startWork();
+#ifndef _WIN32
+  g_hexfilename = std::string("hexfiles/linkbot_latest.hex");
+#else
+  /* Get the install path of BaroboLink from the registry */
+  DWORD size;
+  HKEY key;
+  int rc;
+
+  rc = RegOpenKeyEx(
+      HKEY_LOCAL_MACHINE,
+      "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\BaroboLink.exe",
+      0,
+      KEY_QUERY_VALUE,
+      &key);
+
+  if (ERROR_SUCCESS != rc) {
+    GtkWidget* d = gtk_message_dialog_new(
+        GTK_WINDOW(gtk_builder_get_object(g_builder, "window1")),
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_ERROR,
+        GTK_BUTTONS_OK,
+	"Unable to find BaroboLink location in registry.\nTry re-installing BaroboLink.");
+    gtk_dialog_run(GTK_DIALOG(d));
+    return;
+  }
+
+  /* Find out how much memory to allocate. */
+  rc = RegQueryValueEx(
+      key,
+      "PATH",
+      NULL,
+      NULL,
+      NULL,
+      &size);
+  assert(ERROR_SUCCESS == rc);
+
+  /* hlh: FIXME this should probably be TCHAR instead, and we should support
+   * unicode or whatever */
+  char* path = new char [size + 1];
+
+  rc = RegQueryValueEx(
+      key,
+      "PATH",
+      NULL,
+      NULL,
+      (LPBYTE)path,
+      &size);
+  assert(ERROR_SUCCESS == rc);
+
+  path[size] = '\0';
+
+  g_hexfilename = std::string(path) + "\\hexfiles\\linkbot_latest.hex";
+  delete [] path;
+  path = NULL;
+#endif
 }
 
 Dialog::~Dialog()
@@ -87,7 +144,7 @@ void Dialog::beginProgramming()
 #endif
   }
   qDebug() << "Attempting to begin programming...";
-  stk_->programAllAsync("v3.0.1-98.hex");
+  stk_->programAllAsync(g_hexfilename.c_str());
   ui->progressBar->setEnabled(true);
   /* Start a timer to update the progress bar */
   timer_ = new QTimer(this);
