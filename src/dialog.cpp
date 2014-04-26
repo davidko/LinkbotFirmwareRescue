@@ -4,13 +4,11 @@
 #include <mobot.h>
 #include <QDebug>
 #include <QMessageBox>
-#include <cassert>
 
-std::string g_hexfilename;
-
-Dialog::Dialog(QWidget *parent) :
+Dialog::Dialog(QWidget *parent, QString hexfilename) :
     QDialog(parent),
-    ui(new Ui::Dialog)
+    ui(new Ui::Dialog),
+    hexfilename_(hexfilename)
 {
   ui->setupUi(this);
   ui->progressBar->setMinimum(0);
@@ -19,54 +17,6 @@ Dialog::Dialog(QWidget *parent) :
   QObject::connect(dongleListener_, SIGNAL(dongleDetected(const QString&)),
       this, SLOT(beginProgramming()));
   dongleListener_->startWork();
-#ifndef _WIN32
-  g_hexfilename = std::string("hexfiles/linkbot_latest.hex");
-#else
-  /* Get the install path of BaroboLink from the registry */
-  DWORD size;
-  HKEY key;
-  int rc;
-
-  rc = RegOpenKeyExA(
-      HKEY_LOCAL_MACHINE,
-      "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\BaroboLink.exe",
-      0,
-      KEY_QUERY_VALUE,
-      &key);
-
-  if (ERROR_SUCCESS != rc) {
-    return;
-  }
-
-  /* Find out how much memory to allocate. */
-  rc = RegQueryValueExA(
-      key,
-      "PATH",
-      NULL,
-      NULL,
-      NULL,
-      &size);
-  assert(ERROR_SUCCESS == rc);
-
-  /* hlh: FIXME this should probably be TCHAR instead, and we should support
-   * unicode or whatever */
-  char* path = new char [size + 1];
-
-  rc = RegQueryValueExA(
-      key,
-      "PATH",
-      NULL,
-      NULL,
-      (LPBYTE)path,
-      &size);
-  assert(ERROR_SUCCESS == rc);
-
-  path[size] = '\0';
-
-  g_hexfilename = std::string(path) + "\\hexfiles\\linkbot_latest.hex";
-  delete [] path;
-  path = NULL;
-#endif
 }
 
 Dialog::~Dialog()
@@ -138,7 +88,7 @@ void Dialog::beginProgramming()
 #endif
   }
   qDebug() << "Attempting to begin programming...";
-  stk_->programAllAsync(g_hexfilename.c_str());
+  stk_->programAllAsync(hexfilename_.toStdString().c_str());
   ui->progressBar->setEnabled(true);
   /* Start a timer to update the progress bar */
   timer_ = new QTimer(this);
