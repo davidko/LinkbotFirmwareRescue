@@ -20,7 +20,7 @@ static QString defaultHexFileName () {
 
   if (ERROR_SUCCESS != rc) {
     // FIXME?
-    return "hexfiles/linkbot_latest.hex";
+    return "hexfiles\\linkbot_latest.hex";
   }
 
   /* Find out how much memory to allocate. */
