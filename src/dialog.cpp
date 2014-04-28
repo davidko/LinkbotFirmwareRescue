@@ -3,6 +3,7 @@
 #include <libstkcomms.hpp>
 #include <mobot.h>
 #include <QDebug>
+#include <QFileInfo>
 #include <QMessageBox>
 
 Dialog::Dialog(QWidget *parent, QString hexfilename) :
@@ -11,6 +12,13 @@ Dialog::Dialog(QWidget *parent, QString hexfilename) :
     hexfilename_(hexfilename)
 {
   ui->setupUi(this);
+
+  /* Find and replace the firmware version text template with the actual
+   * firmware version. Kinda hacky. */
+  auto html = ui->textBrowser->toHtml();
+  html.replace("{{FIRMWARE_VERSION}}", QFileInfo(hexfilename).baseName());
+  ui->textBrowser->setHtml(html);
+
   ui->progressBar->setMinimum(0);
   ui->progressBar->setMaximum(100);
   dongleListener_ = new Listener(this);
