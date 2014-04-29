@@ -13,14 +13,18 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = LinkbotFirmwareRescue
 TEMPLATE = app
 
-INCLUDEPATH = ../libstkcomms ../libbarobo/include
+INCLUDEPATH = ../libstkcomms/include ../libbarobo/include
 
-SOURCES += main.cpp\
-        dialog.cpp\
-        listener.cpp
+SOURCES += src/main.cpp\
+        src/dialog.cpp\
+        src/listener.cpp
 
-HEADERS  += dialog.h listener.h
+HEADERS  += src/dialog.h src/listener.h
 
-FORMS    += dialog.ui
+FORMS    += ui/dialog.ui
 
 LIBS += -L../libstkcomms/build -lstkcomms -L../stage/lib -lbarobo -lws2_32
+
+*-g++* {
+  QMAKE_CXXFLAGS=-std=c++11
+}
