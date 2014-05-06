@@ -39,9 +39,9 @@ void Dialog::beginProgramming()
   int rc;
   QMessageBox msgbox;
 #ifdef _WIN32
-    Sleep(3000);
+    Sleep(2000);
 #else
-    usleep(3000000);
+    usleep(2000000);
 #endif
   rc = Mobot_dongleGetTTY(buf, 1024);
   if(rc) {
