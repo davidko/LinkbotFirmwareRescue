@@ -48,7 +48,7 @@ static QString defaultHexFileName () {
 
   path[size] = '\0';
 
-  auto ret = QString(path) + "\\hexfiles\\linkbot_v3.0.4.hex";
+  auto ret = QString(path) + "\\hexfiles\\linkbot_v3.0.5.hex";
   delete [] path;
   path = NULL;
 
