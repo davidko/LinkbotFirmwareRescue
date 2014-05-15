@@ -5,6 +5,10 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <cassert>
+#ifdef __APPLE__
+#include "CoreFoundation/CoreFoundation.h"
+#endif
 
 Dialog::Dialog(QWidget *parent, QString hexfilename) :
     QDialog(parent),
@@ -25,6 +29,70 @@ Dialog::Dialog(QWidget *parent, QString hexfilename) :
   QObject::connect(dongleListener_, SIGNAL(dongleDetected(const QString&)),
       this, SLOT(beginProgramming()));
   dongleListener_->startWork();
+#ifndef _WIN32
+// ----------------------------------------------------------------------------
+// This makes relative paths work in C++ in Xcode by changing directory to the Resources folder inside the .app bundle
+#ifdef __APPLE__    
+    CFBundleRef mainBundle = CFBundleGetMainBundle();
+    CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+    char path[PATH_MAX];
+    if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX)) 
+    {
+    }
+    CFRelease(resourcesURL); 
+
+    chdir(path); 
+  g_hexfilename = std::string(path) + std::string("/hexfiles/linkbot_latest.hex");
+  qDebug() << "Using hexfile at: " << QString::fromStdString(g_hexfilename);
+#else
+  g_hexfilename = std::string("hexfiles/linkbot_latest.hex");
+#endif
+#else
+  /* Get the install path of BaroboLink from the registry */
+  DWORD size;
+  HKEY key;
+  int rc;
+
+  rc = RegOpenKeyExA(
+      HKEY_LOCAL_MACHINE,
+      "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\BaroboLink.exe",
+      0,
+      KEY_QUERY_VALUE,
+      &key);
+
+  if (ERROR_SUCCESS != rc) {
+    return;
+  }
+
+  /* Find out how much memory to allocate. */
+  rc = RegQueryValueExA(
+      key,
+      "PATH",
+      NULL,
+      NULL,
+      NULL,
+      &size);
+  assert(ERROR_SUCCESS == rc);
+
+  /* hlh: FIXME this should probably be TCHAR instead, and we should support
+   * unicode or whatever */
+  char* path = new char [size + 1];
+
+  rc = RegQueryValueExA(
+      key,
+      "PATH",
+      NULL,
+      NULL,
+      (LPBYTE)path,
+      &size);
+  assert(ERROR_SUCCESS == rc);
+
+  path[size] = '\0';
+
+  g_hexfilename = std::string(path) + "\\hexfiles\\linkbot_latest.hex";
+  delete [] path;
+  path = NULL;
+#endif
 }
 
 Dialog::~Dialog()
@@ -37,11 +105,18 @@ void Dialog::beginProgramming()
   int numTries = 0;
   char buf[1024];
   int rc;
+  qDebug() << "Begin Programming.";
   QMessageBox msgbox;
 #ifdef _WIN32
     Sleep(2000);
 #else
+<<<<<<< Updated upstream:src/dialog.cpp
     usleep(2000000);
+=======
+#ifndef __MACH__
+    usleep(2000000);
+#endif
+>>>>>>> Stashed changes:dialog.cpp
 #endif
   rc = Mobot_dongleGetTTY(buf, 1024);
   if(rc) {
@@ -65,7 +140,9 @@ void Dialog::beginProgramming()
 #ifdef _WIN32
         Sleep(100);
 #else
+#ifndef __MACH__
         usleep(100000);
+#endif
 #endif
         numTries++;
       }
