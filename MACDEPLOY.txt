@@ -1,0 +1,7 @@
+rm -rf LinkbotFirmwareUpdate.app/
+make clean && make
+mkdir LinkbotFirmwareUpdate.app/Contents/Resources/hexfiles
+< copy hexfile into hexfiles directory >
+macdeployqt LinkbotFirmwareUpdate.app
+sudo rm -rf /Applications/LinkbotFirmwareUpdate.app
+sudo cp -R LinkbotFirmwareUpdate.app /Applications/
