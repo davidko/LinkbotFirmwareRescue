@@ -10,10 +10,12 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = LinkbotFirmwareRescue
+TARGET = LinkbotFirmwareUpdate
 TEMPLATE = app
 
 INCLUDEPATH = ../libstkcomms/include ../libbarobo/include
+
+ICON = Barobo_square.icns
 
 SOURCES += src/main.cpp\
         src/dialog.cpp\
@@ -24,6 +26,10 @@ HEADERS  += src/dialog.h src/listener.h
 FORMS    += ui/dialog.ui
 
 *-g++* {
+  QMAKE_CXXFLAGS=-std=c++11
+}
+
+*clang++* {
   QMAKE_CXXFLAGS=-std=c++11
 }
 
