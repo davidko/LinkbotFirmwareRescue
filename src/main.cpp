@@ -6,7 +6,7 @@
 #endif
 
 static QString defaultHexFileName () {
-  QString hexfilename("linkbot_v3.0.5.hex");
+  QString hexfilename("linkbot_v3.0.9.hex");
 #ifndef _WIN32
 // ----------------------------------------------------------------------------
 // This makes relative paths work in C++ in Xcode by changing directory to the Resources folder inside the .app bundle
