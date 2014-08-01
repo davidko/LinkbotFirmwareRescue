@@ -5,7 +5,7 @@
 #include "CoreFoundation/CoreFoundation.h"
 #endif
 
-static QString defaultHexFileName () {
+QString defaultHexFileName () {
   QString hexfilename("linkbot_v3.0.10.hex");
 #ifndef _WIN32
 // ----------------------------------------------------------------------------

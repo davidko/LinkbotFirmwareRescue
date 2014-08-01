@@ -22,6 +22,7 @@ public:
 public slots:
     void beginProgramming();
     void update_progress_bar();
+    void showFileDialog();
 
 private:
     Ui::Dialog *ui;
@@ -31,5 +32,7 @@ private:
 
     QString hexfilename_;
 };
+
+QString defaultHexFileName();
 
 #endif // DIALOG_H

@@ -3,6 +3,7 @@
 #include <libstkcomms.hpp>
 #include <mobot.h>
 #include <QDebug>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <cassert>
@@ -16,15 +17,14 @@ Dialog::Dialog(QWidget *parent, QString hexfilename) :
 
   /* Find and replace the firmware version text template with the actual
    * firmware version. Kinda hacky. */
-  auto html = ui->textBrowser->toHtml();
-  html.replace("{{FIRMWARE_VERSION}}", QFileInfo(hexfilename).completeBaseName());
-  ui->textBrowser->setHtml(html);
-
+  ui->lineEdit_fileName->insert(hexfilename_);
   ui->progressBar->setMinimum(0);
   ui->progressBar->setMaximum(100);
   dongleListener_ = new Listener(this);
   QObject::connect(dongleListener_, SIGNAL(dongleDetected(const QString&)),
       this, SLOT(beginProgramming()));
+  QObject::connect(ui->pushButton_chooseFile, SIGNAL(clicked()),
+      this, SLOT(showFileDialog()));
   dongleListener_->startWork();
 }
 
@@ -124,4 +124,13 @@ void Dialog::update_progress_bar()
   } else {
     ui->progressBar->setValue(progress*100);
   }
+}
+
+void Dialog::showFileDialog()
+{
+    auto fileName = QFileDialog::getOpenFileName(this,
+         tr("Open Firmware Hex File"), "/", tr("Firmware Files (*.hex)"));
+    qDebug() << fileName;
+    hexfilename_ = fileName;
+    ui->lineEdit_fileName->insert(hexfilename_);
 }
